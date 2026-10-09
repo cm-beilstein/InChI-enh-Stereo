@@ -9,6 +9,7 @@ Usage (from the repo root):
              run with -EnhancedStereochemistry
 """
 
+import hashlib
 import html
 import math
 import os
@@ -308,14 +309,19 @@ def build():
             new, canon = run_inchi(new_exe, block, NEW_OPTS)
 
             svg_name = f"svg/{key}-{ident}.svg"
-            open(os.path.join(ROOT, svg_name), "w").write(draw(block, canon, entry.get("relayout", False)))
+            svg = draw(block, canon, entry.get("relayout", False))
+            open(os.path.join(ROOT, svg_name), "w").write(svg)
+
+            # Content hash in the URL: browsers reload a changed picture
+            # despite GitHub Pages' 10-minute cache
+            svg_url = svg_name + "?v=" + hashlib.sha1(svg.encode()).hexdigest()[:8]
             sdf.append(block.rstrip("\n") + f"\n>  <ID>\n{ident}\n\n>  <OLD>\n{old}\n\n"
                        f">  <NEW>\n{new}\n\n$$$$")
 
             same = old[9:] == new[9:]
             rows.append(
                 f'<tr><td class="id">{ident}</td>'
-                f'<td class="pic"><img src="{svg_name}" width="{SVG_W}" height="{SVG_H}" '
+                f'<td class="pic"><img src="{svg_url}" width="{SVG_W}" height="{SVG_H}" '
                 f'alt="molecule {ident}">{html.escape(entry["title"])}</td>'
                 f'<td class="inchi"><div><span class="tag">old</span>{html.escape(old)}</div>'
                 f'<div{" class=same" if same else ""}><span class="tag">new</span>'
