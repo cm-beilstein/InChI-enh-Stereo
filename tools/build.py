@@ -31,9 +31,9 @@ CODE = os.path.dirname(ROOT)
 OLD_OPTS = []
 NEW_OPTS = ["-EnhancedStereochemistry"]
 SVG_W, SVG_H = 320, 240
-CANON_FONT_PX = 9
-CANON_GAP_PX = 8          # number to bare carbon
-CANON_GAP_SYMBOL_PX = 14  # number to an atom symbol (O, Cl, ...)
+CANON_FONT_PX = 11
+CANON_GAP_PX = 9          # number to bare carbon
+CANON_GAP_SYMBOL_PX = 15  # number to an atom symbol (O, Cl, ...)
 ATOM_FONT_MAX_PX = 18     # atom symbols on small molecules
 
 # V3000 collection name -> label drawn next to the atom or bond
@@ -262,7 +262,7 @@ def canon_labels(d, mol, canon):
 
             OH 5
             |
-        1 - C 4 ...      offset 8 px (14 px next to a symbol), less on small drawings
+        1 - C 4 ...      offset 9 px (15 px next to a symbol), less on small drawings
     """
     pos = {a.GetIdx(): tuple(d.GetDrawCoords(a.GetIdx())) for a in mol.GetAtoms()}
     lengths = [math.dist(pos[b.GetBeginAtomIdx()], pos[b.GetEndAtomIdx()])
