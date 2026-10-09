@@ -31,6 +31,10 @@ CODE = os.path.dirname(ROOT)
 OLD_OPTS = []
 NEW_OPTS = ["-EnhancedStereochemistry"]
 SVG_W, SVG_H = 320, 240
+CANON_FONT_PX = 9
+CANON_GAP_PX = 8          # number to bare carbon
+CANON_GAP_SYMBOL_PX = 14  # number to an atom symbol (O, Cl, ...)
+ATOM_FONT_MAX_PX = 18     # atom symbols on small molecules
 
 # V3000 collection name -> label drawn next to the atom or bond
 #   STEABS -> abs, STEREL1 -> or1, STERAC2 -> and2, STEBREL1 -> or1
@@ -216,15 +220,9 @@ def draw(block, canon, relayout=False):
     # which miss allene axes and bond groups
     mol = Chem.RWMol(mol)
     mol.SetStereoGroups([])
-    # Atom note: canonical number, then the collection label, e.g. "4 (or1)"
-    notes = collection_notes(block)
-    for a in mol.GetAtoms():
-        text = [str(canon[a.GetIdx()])] if a.GetIdx() in canon else []
-        if ("atom", a.GetIdx()) in notes:
-            text.append("(" + notes[("atom", a.GetIdx())] + ")")
-        if text:
-            a.SetProp("atomNote", " ".join(text))
-    for (target, i), label in notes.items():
+    for (target, i), label in collection_notes(block).items():
+        if target == "atom" and i < mol.GetNumAtoms():
+            mol.GetAtomWithIdx(i).SetProp("atomNote", label)
         if target == "bond" and i < mol.GetNumBonds():
             mol.GetBondWithIdx(i).SetProp("bondNote", label)
 
@@ -233,12 +231,74 @@ def draw(block, canon, relayout=False):
     o.addStereoAnnotation = False
     o.annotationFontScale = 0.8
     o.clearBackground = False
+    o.padding = 0.1  # room for the canonical numbers at the edge
+    o.maxFontSize = ATOM_FONT_MAX_PX
     mol = rdMolDraw2D.PrepareMolForDrawing(mol, kekulize=True, addChiralHs=False,
                                            wedgeBonds=False)
     d.DrawMolecule(mol)
     d.FinishDrawing()
     svg = d.GetDrawingText()
-    return svg[svg.index("<svg"):]
+    svg = svg[svg.index("<svg"):]
+    return svg.replace("</svg>", canon_labels(d, mol, canon) + "</svg>")
+
+
+def has_symbol(atom, pos):
+    """Does RDKit print a symbol for this atom? Heteroatoms, lone atoms
+    and linear carbons (allene centre) get one."""
+    nbrs = [n.GetIdx() for n in atom.GetNeighbors()]
+    if atom.GetAtomicNum() != 6 or not nbrs:
+        return True
+    if len(nbrs) != 2:
+        return False
+    a, b, c = pos[nbrs[0]], pos[atom.GetIdx()], pos[nbrs[1]]
+    u, v = (a[0] - b[0], a[1] - b[1]), (c[0] - b[0], c[1] - b[1])
+    cos = (u[0] * v[0] + u[1] * v[1]) / (math.hypot(*u) * math.hypot(*v) or 1)
+    return cos < -0.98
+
+
+def canon_labels(d, mol, canon):
+    """Small grey canonical numbers beside each atom, on the side away
+    from its bonds:
+
+            OH 5
+            |
+        1 - C 4 ...      offset 8 px (14 px next to a symbol), less on small drawings
+    """
+    pos = {a.GetIdx(): tuple(d.GetDrawCoords(a.GetIdx())) for a in mol.GetAtoms()}
+    lengths = [math.dist(pos[b.GetBeginAtomIdx()], pos[b.GetEndAtomIdx()])
+               for b in mol.GetBonds()]
+    bond = sorted(lengths)[len(lengths) // 2] if lengths else 30.0
+
+    out = []
+    for atom in mol.GetAtoms():
+        i = atom.GetIdx()
+        if i not in canon:
+            continue
+
+        # Direction: away from the mean of the bond directions; a linear
+        # or lone atom goes perpendicular / down-right
+        x, y = pos[i]
+        dx = dy = 0.0
+        for n in atom.GetNeighbors():
+            nx, ny = pos[n.GetIdx()]
+            length = math.hypot(nx - x, ny - y) or 1
+            dx -= (nx - x) / length
+            dy -= (ny - y) / length
+        if math.hypot(dx, dy) < 0.3:
+            if atom.GetDegree():
+                nx, ny = pos[atom.GetNeighbors()[0].GetIdx()]
+                dx, dy = -(ny - y), nx - x
+            else:
+                dx, dy = 1.0, 1.0
+        norm = math.hypot(dx, dy)
+        r = min(bond * (0.45 if has_symbol(atom, pos) else 0.15),
+                CANON_GAP_SYMBOL_PX if has_symbol(atom, pos) else CANON_GAP_PX)
+        lx = min(max(x + dx / norm * r, CANON_FONT_PX), SVG_W - CANON_FONT_PX)
+        ly = min(max(y + dy / norm * r, CANON_FONT_PX), SVG_H - CANON_FONT_PX)
+        out.append(f'<text x="{lx:.1f}" y="{ly:.1f}" font-size="{CANON_FONT_PX}" '
+                   'fill="#666" font-family="sans-serif" text-anchor="middle" '
+                   f'dominant-baseline="central">{canon[i]}</text>')
+    return "".join(out)
 
 
 # ------------------------------------------------------------------- HTML
@@ -285,8 +345,8 @@ b {{ color: #b00; }}
 <b>old</b>: InChI <code>dev</code> ({old_ver}), default options.
 <b>new</b>: branch <code>atropisomers</code> ({new_ver}, contains all four features),
 <code>-EnhancedStereochemistry</code>. The changed tail of the new InChI is in red.
-Atom notes in the pictures: canonical number of the new InChI (per component),
-then the collection label <code>abs</code>, <code>or<i>n</i></code>,
+Small grey numbers in the pictures: canonical atom numbers of the new InChI
+(per component). Collection labels <code>abs</code>, <code>or<i>n</i></code>,
 <code>and<i>n</i></code>. Generated by <code>tools/build.py</code>.</p>
 <nav>{nav}</nav>
 {tables}
