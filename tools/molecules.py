@@ -210,7 +210,7 @@ ATROPISOMERS = [
     dict(title="edge: both wedges on one side (degenerate)", sdf=(ATROP_SDF, 14)),
     dict(title="(M)-BINOL", sdf=(ATROP_SDF, 16)),
     dict(title="(P)-BINOL", sdf=(ATROP_SDF, 18)),
-    dict(title="lignan, biaryl in 8-ring (M); labelled atropisomer, no axis since 2ea128d", sdf=(ATROP_SDF, 21)),
+    dict(title="lignan, biaryl bridged into an 8-ring (M)", sdf=(ATROP_SDF, 21)),
     dict(title="same lignan (P)", sdf=(ATROP_SDF, 25)),
     dict(title="edge: bare bridged biaryl, 7-ring (fast ring flip)",
          tests=(ATROP_TESTS, "k_dummy12_molblock =")),
