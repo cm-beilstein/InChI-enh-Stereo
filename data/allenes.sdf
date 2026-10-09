@@ -449,7 +449,7 @@ InChI=1S/C4H3BrClF/c1-3(6)2-4(5)7/h1H3
 InChI=1B/C4H3BrClF/c1-3(6)2-4(5)7/h1H3/t2-/s3
 
 $$$$
-edge: AND group names a terminal atom: ignored, but /s is lost (bug)
+edge: AND group names a terminal atom (ignored)
      RDKit          2D
 
   0  0  0  0  0  0  0  0  0  0999 V3000
@@ -484,7 +484,7 @@ M  END
 InChI=1S/C4H3BrClF/c1-3(6)2-4(5)7/h1H3/t2-/m0/s1
 
 >  <NEW>
-InChI=1B/C4H3BrClF/c1-3(6)2-4(5)7/h1H3/t2-/m0
+InChI=1B/C4H3BrClF/c1-3(6)2-4(5)7/h1H3/t2-/m0/s1
 
 $$$$
 edge: symmetric end, no axis

@@ -107,7 +107,7 @@ ALLENES = [
          coll=[("STERAC1", [3])]),
     dict(title="AND group, single wedge", smiles=DECK, wedges=[(4, 6, UP)],
          coll=[("STERAC1", [3])]),
-    dict(title="edge: AND group names a terminal atom: ignored, but /s is lost (bug)", smiles=DECK,
+    dict(title="edge: AND group names a terminal atom (ignored)", smiles=DECK,
          wedges=DECK_RA, coll=[("STERAC1", [1])]),
     dict(title="edge: symmetric end, no axis", smiles="CC(C)=C=CCl",
          wedges=[(1, 0, UP), (4, 5, DOWN)]),
