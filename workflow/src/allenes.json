@@ -1,0 +1,252 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Allenes: from drawing to InChI",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "external": {
+          "label": "Your drawing"
+        },
+        "backend": {
+          "label": "InChI interprets"
+        },
+        "security": {
+          "label": "Ignored or dropped"
+        },
+        "database": {
+          "label": "InChI layer written"
+        }
+      }
+    },
+    "output": "workflow/allenes.html"
+  },
+  "lanes": [
+    {
+      "id": "draw",
+      "label": "You draw"
+    },
+    {
+      "id": "drop",
+      "label": "Ignored or dropped",
+      "variant": "exception"
+    },
+    {
+      "id": "read",
+      "label": "InChI interprets"
+    },
+    {
+      "id": "out",
+      "label": "InChI writes"
+    }
+  ],
+  "mainPath": [
+    "allene",
+    "wedge",
+    "ends",
+    "axis",
+    "label",
+    "s"
+  ],
+  "nodes": [
+    {
+      "id": "allene",
+      "lane": "draw",
+      "col": 0,
+      "type": "external",
+      "label": "Allene C=C=C",
+      "sublabel": "substituents at both ends",
+      "width": 176,
+      "icon": "person"
+    },
+    {
+      "id": "wedge",
+      "lane": "draw",
+      "col": 1,
+      "type": "external",
+      "label": "Wedges at the ends",
+      "sublabel": "two, or now just one",
+      "width": 176,
+      "icon": "flag"
+    },
+    {
+      "id": "ends",
+      "lane": "read",
+      "col": 2,
+      "type": "backend",
+      "label": "Both ends dissymmetric?",
+      "sublabel": "two different substituents",
+      "width": 176
+    },
+    {
+      "id": "axis",
+      "lane": "read",
+      "col": 3,
+      "type": "backend",
+      "label": "Axis from the wedges",
+      "sublabel": "consistent wedges give M or P",
+      "width": 176
+    },
+    {
+      "id": "label",
+      "lane": "read",
+      "col": 4,
+      "type": "backend",
+      "label": "Label on central carbon",
+      "sublabel": "abs · or · and",
+      "width": 176
+    },
+    {
+      "id": "sym",
+      "lane": "drop",
+      "col": 2,
+      "type": "security",
+      "label": "No axis",
+      "sublabel": "symmetric end (row 45)",
+      "width": 176
+    },
+    {
+      "id": "undef",
+      "lane": "drop",
+      "col": 3,
+      "type": "security",
+      "label": "Undefined",
+      "sublabel": "flat or contradicting (34, 38)",
+      "width": 176
+    },
+    {
+      "id": "term",
+      "lane": "drop",
+      "col": 4,
+      "type": "security",
+      "label": "Label ignored",
+      "sublabel": "on a terminal carbon (row 44)",
+      "width": 176
+    },
+    {
+      "id": "t",
+      "lane": "out",
+      "col": 3,
+      "type": "database",
+      "label": "/t  on central carbon",
+      "sublabel": "the axis as a stereo centre",
+      "width": 176
+    },
+    {
+      "id": "m",
+      "lane": "out",
+      "col": 4,
+      "type": "database",
+      "label": "/m  which enantiomer",
+      "sublabel": "only for abs",
+      "width": 176
+    },
+    {
+      "id": "s",
+      "lane": "out",
+      "col": 5,
+      "type": "database",
+      "label": "/s  stereo class",
+      "sublabel": "1 abs · 2 or · 3 and",
+      "width": 176
+    }
+  ],
+  "edges": [
+    {
+      "id": "a1",
+      "from": "allene",
+      "to": "wedge"
+    },
+    {
+      "id": "a2",
+      "from": "wedge",
+      "to": "ends",
+      "label": "read"
+    },
+    {
+      "id": "a3",
+      "from": "ends",
+      "to": "axis"
+    },
+    {
+      "id": "a4",
+      "from": "axis",
+      "to": "label"
+    },
+    {
+      "id": "a5",
+      "from": "label",
+      "to": "s",
+      "label": "class"
+    },
+    {
+      "id": "a6",
+      "from": "ends",
+      "to": "sym",
+      "label": "same groups",
+      "role": "error",
+      "variant": "security"
+    },
+    {
+      "id": "a7",
+      "from": "axis",
+      "to": "undef",
+      "label": "no geometry",
+      "role": "error",
+      "variant": "security"
+    },
+    {
+      "id": "a8",
+      "from": "label",
+      "to": "term",
+      "label": "wrong atom",
+      "role": "branch",
+      "variant": "dashed"
+    },
+    {
+      "id": "a9",
+      "from": "axis",
+      "to": "t",
+      "label": "configuration",
+      "role": "branch"
+    },
+    {
+      "id": "a10",
+      "from": "label",
+      "to": "m",
+      "label": "abs only",
+      "role": "branch"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "What is new",
+      "items": [
+        "One wedge at one end defines the axis (row 37)",
+        "abs / or / and labels on the central carbon (40–43)",
+        "Classic two-wedge allenes stay as before (31, 35)"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Read the examples",
+      "items": [
+        "Row 37: /t2-/m1/s1, old InChI had no stereo",
+        "Row 41 or: /t2-/s2, row 42 and: /t2-/s3",
+        "Row 49: /t2-,5-/m0/s1(5)3(2)",
+        "  allene 2 racemic, centre 5 absolute"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Limits",
+      "items": [
+        "Butatriene C=C=C=C is E/Z: written in /b (53)",
+        "Longer odd cumulenes: not encoded (54)"
+      ]
+    }
+  ]
+}

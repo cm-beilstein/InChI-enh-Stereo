@@ -1,0 +1,237 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Double-bond E/Z: from drawing to InChI",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "external": {
+          "label": "Your drawing"
+        },
+        "backend": {
+          "label": "InChI interprets"
+        },
+        "security": {
+          "label": "Ignored or dropped"
+        },
+        "database": {
+          "label": "InChI layer written"
+        }
+      }
+    },
+    "output": "workflow/ez.html"
+  },
+  "lanes": [
+    {
+      "id": "draw",
+      "label": "You draw"
+    },
+    {
+      "id": "drop",
+      "label": "Ignored or dropped",
+      "variant": "exception"
+    },
+    {
+      "id": "read",
+      "label": "InChI interprets"
+    },
+    {
+      "id": "out",
+      "label": "InChI writes"
+    }
+  ],
+  "mainPath": [
+    "geom",
+    "label",
+    "defined",
+    "valid",
+    "norm",
+    "and"
+  ],
+  "nodes": [
+    {
+      "id": "geom",
+      "lane": "draw",
+      "col": 0,
+      "type": "external",
+      "label": "Double bond as drawn",
+      "sublabel": "E or Z geometry",
+      "width": 176,
+      "icon": "person"
+    },
+    {
+      "id": "label",
+      "lane": "draw",
+      "col": 1,
+      "type": "external",
+      "label": "Bond labels",
+      "sublabel": "abs · or · and on bonds",
+      "width": 176,
+      "icon": "flag"
+    },
+    {
+      "id": "defined",
+      "lane": "read",
+      "col": 2,
+      "type": "backend",
+      "label": "Defined E/Z?",
+      "sublabel": "not crossed, not wavy",
+      "width": 176
+    },
+    {
+      "id": "valid",
+      "lane": "read",
+      "col": 3,
+      "type": "backend",
+      "label": "Label on a stereo bond?",
+      "sublabel": "C=C or C=N with E/Z",
+      "width": 176
+    },
+    {
+      "id": "norm",
+      "lane": "read",
+      "col": 4,
+      "type": "backend",
+      "label": "Normalise each group",
+      "sublabel": "first bond '-', rest relative",
+      "width": 176
+    },
+    {
+      "id": "unk",
+      "lane": "drop",
+      "col": 2,
+      "type": "security",
+      "label": "No /b entry",
+      "sublabel": "unknown geometry (row 61)",
+      "width": 176
+    },
+    {
+      "id": "ign",
+      "lane": "drop",
+      "col": 3,
+      "type": "security",
+      "label": "Label ignored / dropped",
+      "sublabel": "single bond (71), twice (72)",
+      "width": 176
+    },
+    {
+      "id": "flat",
+      "lane": "out",
+      "col": 3,
+      "type": "database",
+      "label": "/b  flat entries",
+      "sublabel": "abs: as standard InChI",
+      "width": 176
+    },
+    {
+      "id": "or",
+      "lane": "out",
+      "col": 4,
+      "type": "database",
+      "label": "/b  2( … )",
+      "sublabel": "or: one isomer, unknown",
+      "width": 176
+    },
+    {
+      "id": "and",
+      "lane": "out",
+      "col": 5,
+      "type": "database",
+      "label": "/b  3( … )",
+      "sublabel": "and: E/Z mixture",
+      "width": 176
+    }
+  ],
+  "edges": [
+    {
+      "id": "z1",
+      "from": "geom",
+      "to": "label"
+    },
+    {
+      "id": "z2",
+      "from": "label",
+      "to": "defined",
+      "label": "read"
+    },
+    {
+      "id": "z3",
+      "from": "defined",
+      "to": "valid"
+    },
+    {
+      "id": "z4",
+      "from": "valid",
+      "to": "norm",
+      "label": "or / and"
+    },
+    {
+      "id": "z5",
+      "from": "norm",
+      "to": "and",
+      "label": "and"
+    },
+    {
+      "id": "z6",
+      "from": "defined",
+      "to": "unk",
+      "label": "unknown",
+      "role": "error",
+      "variant": "security"
+    },
+    {
+      "id": "z7",
+      "from": "valid",
+      "to": "ign",
+      "label": "invalid",
+      "role": "branch",
+      "variant": "dashed"
+    },
+    {
+      "id": "z8",
+      "from": "valid",
+      "to": "flat",
+      "label": "abs",
+      "role": "branch"
+    },
+    {
+      "id": "z9",
+      "from": "norm",
+      "to": "or",
+      "label": "or",
+      "role": "branch"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Read /b2(2-1-), row 58",
+      "items": [
+        "2: the class (or), not an atom number",
+        "(2-1-): the bond between atoms 2 and 1",
+        "'-' is normalised: row 60 draws E, same InChI",
+        "Without the class, /b2-1- means Z, known (row 55)"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Groups of several bonds",
+      "items": [
+        "One and group keeps relative geometry (63, 64)",
+        "(E,Z) and (Z,E): 3(4-2-,5-3+)",
+        "(E,E) and (Z,Z): 3(4-2-,5-3-)"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Order and combinations",
+      "items": [
+        "Flat entries, then 2(…), then 3(…) (row 79)",
+        "Bonds and centres are independent:",
+        "  row 69: /b2(4-3-)/t2-/m1/s1"
+      ]
+    }
+  ]
+}

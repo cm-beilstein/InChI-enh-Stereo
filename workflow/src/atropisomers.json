@@ -1,0 +1,237 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Atropisomers: from drawing to InChI",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "external": {
+          "label": "Your drawing"
+        },
+        "backend": {
+          "label": "InChI interprets"
+        },
+        "security": {
+          "label": "Ignored or dropped"
+        },
+        "database": {
+          "label": "InChI layer written"
+        }
+      }
+    },
+    "output": "workflow/atropisomers.html"
+  },
+  "lanes": [
+    {
+      "id": "draw",
+      "label": "You draw"
+    },
+    {
+      "id": "drop",
+      "label": "Ignored or dropped",
+      "variant": "exception"
+    },
+    {
+      "id": "read",
+      "label": "InChI interprets"
+    },
+    {
+      "id": "out",
+      "label": "InChI writes"
+    }
+  ],
+  "mainPath": [
+    "mol",
+    "geo",
+    "cand",
+    "hind",
+    "config",
+    "s"
+  ],
+  "nodes": [
+    {
+      "id": "mol",
+      "lane": "draw",
+      "col": 0,
+      "type": "external",
+      "label": "Hindered single bond",
+      "sublabel": "biaryl or bulky chain",
+      "width": 176,
+      "icon": "person"
+    },
+    {
+      "id": "geo",
+      "lane": "draw",
+      "col": 1,
+      "type": "external",
+      "label": "Wedges or 3D",
+      "sublabel": "one wedge is enough",
+      "width": 176,
+      "icon": "flag"
+    },
+    {
+      "id": "cand",
+      "lane": "read",
+      "col": 2,
+      "type": "backend",
+      "label": "Candidate axis?",
+      "sublabel": "C–C single, 2 substituents each end",
+      "width": 176
+    },
+    {
+      "id": "hind",
+      "lane": "read",
+      "col": 3,
+      "type": "backend",
+      "label": "Rotation blocked?",
+      "sublabel": "≥3 of 4 ortho groups; 2 in 8-ring",
+      "width": 176
+    },
+    {
+      "id": "config",
+      "lane": "read",
+      "col": 4,
+      "type": "backend",
+      "label": "Axis configuration",
+      "sublabel": "M or P from wedges or 3D",
+      "width": 176
+    },
+    {
+      "id": "oos",
+      "lane": "drop",
+      "col": 2,
+      "type": "security",
+      "label": "Not covered yet",
+      "sublabel": "C–N and N–N axes (100–103)",
+      "width": 176
+    },
+    {
+      "id": "free",
+      "lane": "drop",
+      "col": 3,
+      "type": "security",
+      "label": "No axis",
+      "sublabel": "rotates freely (97, 105)",
+      "width": 176
+    },
+    {
+      "id": "undef",
+      "lane": "drop",
+      "col": 4,
+      "type": "security",
+      "label": "Undefined",
+      "sublabel": "flat or degenerate (89, 92)",
+      "width": 176
+    },
+    {
+      "id": "t",
+      "lane": "out",
+      "col": 4,
+      "type": "database",
+      "label": "/t  /m  the axis",
+      "sublabel": "lower axis atom · M: /m0, P: /m1",
+      "width": 176
+    },
+    {
+      "id": "s",
+      "lane": "out",
+      "col": 5,
+      "type": "database",
+      "label": "/s  stereo class",
+      "sublabel": "abs · or · and on the axis",
+      "width": 176
+    }
+  ],
+  "edges": [
+    {
+      "id": "b1",
+      "from": "mol",
+      "to": "geo"
+    },
+    {
+      "id": "b2",
+      "from": "geo",
+      "to": "cand",
+      "label": "read"
+    },
+    {
+      "id": "b3",
+      "from": "cand",
+      "to": "hind"
+    },
+    {
+      "id": "b4",
+      "from": "hind",
+      "to": "config"
+    },
+    {
+      "id": "b5",
+      "from": "config",
+      "to": "s",
+      "label": "class"
+    },
+    {
+      "id": "b6",
+      "from": "cand",
+      "to": "oos",
+      "label": "other atoms",
+      "role": "branch",
+      "variant": "dashed"
+    },
+    {
+      "id": "b7",
+      "from": "hind",
+      "to": "free",
+      "label": "too little",
+      "role": "error",
+      "variant": "security"
+    },
+    {
+      "id": "b8",
+      "from": "config",
+      "to": "undef",
+      "label": "no geometry",
+      "role": "error",
+      "variant": "security"
+    },
+    {
+      "id": "b9",
+      "from": "config",
+      "to": "t",
+      "label": "M / P",
+      "role": "branch"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Read rows 82 and 84",
+      "items": [
+        "(M): /t11-/m0/s1 · (P): /t11-/m1/s1",
+        "11: the lower-numbered axis carbon",
+        "Old InChI: no stereo layer at all"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "One molecule, one InChI",
+      "items": [
+        "Other drawing (83), single wedge (88)",
+        "3D coordinates (86): same as row 82",
+        "and label on the axis (91): /t11-/s3"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Hindrance rule",
+      "items": [
+        "≥3 of the 4 ortho positions substituted",
+        "Bridged into an 8-ring: 2 suffice (95, 96)",
+        "7-ring bridge flips fast: no axis (97)",
+        "3,3'-bipyridine: too little hindrance (105)"
+      ]
+    }
+  ]
+}

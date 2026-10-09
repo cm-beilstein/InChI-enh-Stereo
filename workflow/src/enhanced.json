@@ -1,0 +1,228 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Enhanced stereochemistry: from drawing to InChI",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "legend": {
+      "entries": {
+        "external": {
+          "label": "Your drawing"
+        },
+        "backend": {
+          "label": "InChI interprets"
+        },
+        "security": {
+          "label": "Ignored or dropped"
+        },
+        "database": {
+          "label": "InChI layer written"
+        }
+      }
+    },
+    "output": "workflow/enhanced.html"
+  },
+  "lanes": [
+    {
+      "id": "draw",
+      "label": "You draw"
+    },
+    {
+      "id": "drop",
+      "label": "Ignored or dropped",
+      "variant": "exception"
+    },
+    {
+      "id": "read",
+      "label": "InChI interprets"
+    },
+    {
+      "id": "out",
+      "label": "InChI writes"
+    }
+  ],
+  "mainPath": [
+    "wedges",
+    "labels",
+    "check",
+    "absset",
+    "norm",
+    "s"
+  ],
+  "nodes": [
+    {
+      "id": "wedges",
+      "lane": "draw",
+      "col": 0,
+      "type": "external",
+      "label": "Wedged stereocentres",
+      "sublabel": "solid and hashed wedges",
+      "width": 164,
+      "icon": "person"
+    },
+    {
+      "id": "labels",
+      "lane": "draw",
+      "col": 1,
+      "type": "external",
+      "label": "Enhanced labels",
+      "sublabel": "abs · or1 · and1 on atoms",
+      "width": 164,
+      "icon": "flag"
+    },
+    {
+      "id": "check",
+      "lane": "read",
+      "col": 2,
+      "type": "backend",
+      "label": "Keep real stereocentres",
+      "sublabel": "only labelled stereocentres count",
+      "width": 164
+    },
+    {
+      "id": "absset",
+      "lane": "read",
+      "col": 3,
+      "type": "backend",
+      "label": "Absolute set",
+      "sublabel": "abs + unlabelled wedges",
+      "width": 164
+    },
+    {
+      "id": "norm",
+      "lane": "read",
+      "col": 4,
+      "type": "backend",
+      "label": "Normalise or / and",
+      "sublabel": "lowest centre written '-'",
+      "width": 164
+    },
+    {
+      "id": "orphan",
+      "lane": "drop",
+      "col": 2,
+      "type": "security",
+      "label": "Label ignored / dropped",
+      "sublabel": "on a CH2 (20) · 2 molecules (18)",
+      "width": 164
+    },
+    {
+      "id": "m",
+      "lane": "out",
+      "col": 3,
+      "type": "database",
+      "label": "/m  which enantiomer",
+      "sublabel": "only with absolute centres",
+      "width": 164
+    },
+    {
+      "id": "t",
+      "lane": "out",
+      "col": 4,
+      "type": "database",
+      "label": "/t  configuration",
+      "sublabel": "sign per centre",
+      "width": 164
+    },
+    {
+      "id": "s",
+      "lane": "out",
+      "col": 5,
+      "type": "database",
+      "label": "/s  stereo class",
+      "sublabel": "1 abs · 2 or · 3 and",
+      "width": 164
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "wedges",
+      "to": "labels",
+      "label": "add labels"
+    },
+    {
+      "id": "e2",
+      "from": "labels",
+      "to": "check",
+      "label": "read"
+    },
+    {
+      "id": "e3",
+      "from": "check",
+      "to": "absset"
+    },
+    {
+      "id": "e4",
+      "from": "absset",
+      "to": "norm"
+    },
+    {
+      "id": "e5",
+      "from": "norm",
+      "to": "s",
+      "label": "classes"
+    },
+    {
+      "id": "e7",
+      "from": "check",
+      "to": "orphan",
+      "label": "invalid",
+      "role": "error",
+      "variant": "security"
+    },
+    {
+      "id": "e8",
+      "from": "absset",
+      "to": "m",
+      "label": "flip as one",
+      "role": "branch"
+    },
+    {
+      "id": "e9",
+      "from": "norm",
+      "to": "t",
+      "label": "signs",
+      "role": "branch"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "The three classes",
+      "items": [
+        "abs: absolute configuration known",
+        "or: one stereoisomer, unknown which",
+        "and: mixture with the mirror image (racemic)"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Read the examples",
+      "items": [
+        "Row 1 abs: /t4-/m0/s1, as standard InChI",
+        "Row 2 or: /t4-/s2, no /m: enantiomer unknown",
+        "Row 3 and: /t4-/s3, the racemate",
+        "Row 9 abs + or: /t2-,3-/m1/s1(2)2(3)"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Several molecules",
+      "items": [
+        "/t, /m, /s: one ';' slot per molecule",
+        "/s;3: first absolute, second racemic",
+        "A group over two molecules is rejected (row 18)"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Why normalise",
+      "items": [
+        "or / and groups: lowest centre written '-'",
+        "Both drawings of a racemate give one InChI"
+      ]
+    }
+  ]
+}
