@@ -19,6 +19,8 @@ Specs: https://github.com/cm-beilstein/InChI-specs (private)
 - `data/<table>.sdf` — input molblocks with old and new InChI
 - `tools/molecules.py` — molecule sets
 - `tools/build.py` — generator
+- `explain/enhanced.html` — walkthrough for chemists; copied from InChI-Specifications
+  `enhanced-stereo/explain.html` (built there by `tools/explain.py`)
 - `workflow/<table>.html` — how the new InChI is built, per spec, for chemists;
   rendered from `workflow/src/*.json` with [archify](https://github.com/tt-a1i/archify) (MIT)
 
