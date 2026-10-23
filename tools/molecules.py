@@ -226,9 +226,33 @@ ATROPISOMERS = [
     dict(title="edge: overcrowded alkene (E,P)", sdf=(ATROP_SDF, 47)),
 ]
 
+# Groups whose inversion gives the same molecule (GitHub #286). Own table
+# at the end so the IDs of the other tables stay stable.
+DIOL = "O[C@H]1CC[C@H](O)CC1"  # trans
+RING_ETHER = "O[C@H]1CC[C@H](OCC[C@H](N)C)CC1"  # trans ring
+
+MESO = [
+    dict(title="trans-cyclohexane-1,4-diol (achiral), no group", smiles=DIOL),
+    dict(title="same, AND group: ignored", smiles=DIOL + " |&1:1,4|"),
+    dict(title="same, OR group: ignored", smiles=DIOL + " |o1:1,4|"),
+    dict(title="meso butane-2,3-diol, one AND group: ignored",
+         smiles="C[C@@H](O)[C@@H](O)C |&1:1,3|"),
+    dict(title="chiral butane-2,3-diol, one AND group: racemate, kept",
+         smiles="C[C@@H](O)[C@H](O)C |&1:1,3|"),
+    dict(title="chiral by side chain, no group", smiles=RING_ETHER),
+    dict(title="limitation: AND group on the meso ring only (should be ignored)",
+         smiles=RING_ETHER + " |&1:1,4|"),
+    dict(title="limitation: OR group on the meso ring only (should be ignored)",
+         smiles=RING_ETHER + " |o1:1,4|"),
+]
+
 TABLES = [
     ("enhanced", "Enhanced stereochemistry (ABS / OR / AND)", ENHANCED),
     ("allenes", "Allenes", ALLENES),
     ("ez", "Double-bond E/Z", EZ),
     ("atropisomers", "Atropisomers", ATROPISOMERS),
+    ("meso", "Meso compounds: groups that change nothing", MESO),
 ]
+
+# Walkthrough page per table, explain/<page>; default <key>.html
+EXPLAIN = {"meso": "enhanced.html#meso"}

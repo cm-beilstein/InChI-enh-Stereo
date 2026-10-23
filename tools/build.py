@@ -22,7 +22,7 @@ from rdkit import Chem, RDLogger
 from rdkit.Chem import rdDepictor
 from rdkit.Chem.Draw import rdMolDraw2D
 
-from molecules import TABLES, UP, DOWN
+from molecules import EXPLAIN, TABLES, UP, DOWN
 
 RDLogger.DisableLog("rdApp.*")
 
@@ -390,9 +390,16 @@ def build():
 
         open(os.path.join(ROOT, f"data/{key}.sdf"), "w").write("\n".join(sdf) + "\n")
         nav.append(f'<a href="#{key}">{html.escape(title)}</a>')
+
+        # Links to the walkthrough and the workflow diagram, where they exist
+        links = [f'<a href="explain/{EXPLAIN.get(key, key + ".html")}">Explanation for '
+                 'chemists: what the labels mean and how they reach the InChI</a>']
+        if os.path.exists(os.path.join(ROOT, f"workflow/{key}.html")):
+            links.append(f'<a href="workflow/{key}.html">How the new InChI is built: '
+                         'step by step, with examples from this table</a>')
+
         tables.append(f'<h2 id="{key}">{html.escape(title)} ({len(entries)})</h2>\n'
-                      f'<p><a href="workflow/{key}.html">How the new InChI is built: '
-                      'step by step, with examples from this table</a></p>\n'
+                      f'<p>{"<br>".join(links)}</p>\n'
                       '<table><tr><th>ID</th><th>Molecule</th><th>InChI</th></tr>\n'
                       + "\n".join(rows) + "\n</table>")
 

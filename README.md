@@ -8,9 +8,24 @@ prototype for four stereo extensions:
 3. Double-bond E/Z
 4. Atropisomers
 
+plus a table of meso compounds, where a group changes nothing
+([#286](https://github.com/IUPAC-InChI/InChI/issues/286)), with its
+known limitation.
+
 Page: https://cm-beilstein.github.io/InChI-enh-Stereo/
 
 Specs: https://github.com/cm-beilstein/InChI-specs (private)
+
+## Explanations for chemists
+
+What the labels mean and how they reach the InChI, one page per feature
+([source](https://github.com/cm-beilstein/InChI-enh-Stereo/tree/main/explain)):
+
+- [Enhanced stereochemistry](https://cm-beilstein.github.io/InChI-enh-Stereo/explain/enhanced.html)
+  — incl. [meso compounds](https://cm-beilstein.github.io/InChI-enh-Stereo/explain/enhanced.html#meso)
+- [Allenes](https://cm-beilstein.github.io/InChI-enh-Stereo/explain/allenes.html)
+- [Double-bond E/Z](https://cm-beilstein.github.io/InChI-enh-Stereo/explain/ez.html)
+- [Atropisomers](https://cm-beilstein.github.io/InChI-enh-Stereo/explain/atropisomers.html)
 
 ## Contents
 
